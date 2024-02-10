@@ -3,11 +3,14 @@ const app = express();
 const path = require("path");
 const { logger } = require("./middleware/logger");
 const errorHandler = require("./middleware/errorhandler");
+const cookieParser = require("cooker-parser");
 const PORT = process.env.PORT || 3500;
 
 app.use(logger);
 
 app.use(express.json());
+
+app.use(cookieParser());
 
 app.use('/', express.static(path.join(__dirname, 'public')));
 
