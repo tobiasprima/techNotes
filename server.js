@@ -5,6 +5,8 @@ const PORT = process.env.PORT || 3500;
 
 app.use('/', express.static(path.join(__dirname, '/public')));
 
+app.use('/', require('./routes/root'));
+
 app.listen(PORT, function(){
     console.log(`Server is listening on port ${PORT}`)
 })
