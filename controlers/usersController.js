@@ -1,8 +1,7 @@
-const User = require("../models/Note");
+const User = require("../models/User");
 const Notes = require("../models/Note");
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcrypt");
-const Note = require("../models/Note");
 
 //@desc Get all users
 //@route GET /users
@@ -18,7 +17,7 @@ const getAllUsers = asyncHandler(async (req, res, next) => {
 //@desc Create New User
 //@route POST /users
 //@access private
-const createNewUser = asyncHandler(async (req, res, next) => {
+const createNewUser = asyncHandler(async (req, res) => {
     const { username, password, roles} = req.body;
 
     //Confirm Data
@@ -36,7 +35,7 @@ const createNewUser = asyncHandler(async (req, res, next) => {
 
     //Hash Password
     const hashedPassword = await bcrypt.hash(password, 10);
-    const userObject = { username, password: hashedPassword, roles};
+    const userObject = { username, "password": hashedPassword, roles};
 
     //Create and Store new user
     const user = await User.create(userObject);
@@ -59,7 +58,7 @@ const updateUser = asyncHandler(async (req, res, next) => {
         return res.status(404).json({message: 'All fields are required.'});
     }
 
-    const user = await User.find(id).exec();
+    const user = await User.findById(id).exec();
 
     if(!user){
         return res.status(404).json({message: 'User not found'});
