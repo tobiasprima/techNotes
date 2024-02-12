@@ -9,7 +9,7 @@ const Note = require("../models/Note");
 //@access private
 const getAllUsers = asyncHandler(async (req, res, next) => {
     const users = await User.find().select('-password').lean();
-    if(!users){
+    if(!users?.length){
         res.status(400).json({message: 'No users found.'});
     }
     res.json(users);
@@ -19,7 +19,7 @@ const getAllUsers = asyncHandler(async (req, res, next) => {
 //@route POST /users
 //@access private
 const createNewUser = asyncHandler(async (req, res, next) => {
-    const { username, password, roles} = req.body
+    const { username, password, roles} = req.body;
 
     //Confirm Data
     if (!username || !password || !Array.isArray(roles) || !roles.length){
@@ -96,7 +96,7 @@ const deleteUser = asyncHandler(async (req, res, next) => {
         return res.status(400).json({message: 'User ID required.'});
     }
 
-    const notes = await Note.findOne({ user: id}).lean().exec();
+    const notes = await Notes.findOne({ user: id}).lean().exec();
 
     if (notes?.length){
         return res.status(400).json({message: 'User has assigned notes.'});
