@@ -1,6 +1,6 @@
 const Notes = require("../models/Note");
+const User = require("../models/User");
 const asyncHandler = require("express-async-handler");
-const bcrypt = require("bcrypt");
 
 //GET /notes
 const getAllNotes = asyncHandler(async (req,res) => {
@@ -8,7 +8,13 @@ const getAllNotes = asyncHandler(async (req,res) => {
     if(!notes?.length){
         res.status(400).json({message: 'No notes found.'});
     }
-    res.json(notes);
+
+    const notesWithUser = await Promise.all(notes.map(async (note) => {
+        const user = await User.findById(note.user).lean().exec();
+        return {...note, username: user.username};
+    }))
+
+    res.json(notesWithUser);
 })
 
 //POST /notes
@@ -21,12 +27,12 @@ const createNewNote = asyncHandler(async (req,res)=> {
     const duplicate = await Notes.findOne({title}).lean().exec();
 
     if(duplicate){
-        return res.status(400).json({mesasge: 'Duplicate Notes'});
+        return res.status(400).json({mesasge: 'Duplicate Notes Title'});
     }
 
-    const newNote = await Notes.create(req.body);
+    const newNote = await Notes.create({user, title, text});
     if(newNote){
-        res.status(201).json({message: `New Note ${title} created.`});
+        res.status(201).json({message: `New Note created.`});
     } else {
         res.status(404).json({message: 'Invalid data received.'});
     }
@@ -47,15 +53,16 @@ const updateNotes = asyncHandler(async (req, res) => {
     }
 
     const duplicate = await Notes.findOne({title}).lean().exec();
-    if(duplicate && duplicate?.id.toString() !== id){
-        return res.status(409).json({message: 'Duplicate Notes'});
+    if(duplicate && duplicate?._id.toString() !== id){
+        return res.status(409).json({message: 'Duplicate Notes Title'});
     }
 
+    note.user = user;
     note.title = title;
     note.text = text;
     note.completed = completed;
 
-    const updatedNote = await Notes.bulkSave();
+    const updatedNote = await note.save();
     
     res.json({message: `${updatedNote.title} updated.`});
 })
@@ -68,7 +75,7 @@ const deleteNote = asyncHandler(async (req, res) => {
         return res.status(400).json({message: 'Notes ID required'});
     }
 
-    const note = await Notes.findOne({ user: id}).lean().exec();
+    const note = await Notes.findById(id).exec();
 
     if(!note){
         return res.status(400).json({message: 'Note not found'});
@@ -76,7 +83,7 @@ const deleteNote = asyncHandler(async (req, res) => {
 
     const result = await note.deleteOne();
 
-    res.json({message: `Notes ${title} deleted.`});
+    res.json({message: `Notes ${result.title} with ID ${result.id} deleted.`});
 })
 
 module.exports = {
