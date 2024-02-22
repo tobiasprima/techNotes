@@ -13,7 +13,7 @@ const login = asyncHandler(async (req, res) => {
         return res.status(400).json({message: 'All field are required.'});
     }
 
-    const foundUser = await User.findOne({username}.exec());
+    const foundUser = await User.findOne({username}).exec();
 
     if(!foundUser || !foundUser.active){
         return res.status(401).json({message: 'Unauthorized.'})
