@@ -92,7 +92,10 @@ const refresh = asyncHandler(async (req, res) => {
 //@route POST /auth/logout
 //@access public  clear cookie
 const logout = asyncHandler(async ( req, res) => {
-
+    const cookies = req.cookies;
+    if(!cookies?.jwt) return res.status(204) //no content
+    res.clearCookie('jwt', {httpOnly: true, sameSite: 'None', secure: true});
+    res.json({message: 'Cookie cleared.'});
 })
 
 module.exports = {
