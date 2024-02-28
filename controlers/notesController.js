@@ -11,7 +11,8 @@ const getAllNotes = asyncHandler(async (req,res) => {
 
     const notesWithUser = await Promise.all(notes.map(async (note) => {
         const user = await User.findById(note.user).lean().exec();
-        return {...note, username: user.username};
+        const username = user ? user.username : null;
+        return {...note, username};
     }))
 
     res.json(notesWithUser);
