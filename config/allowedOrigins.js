@@ -1,6 +1,5 @@
 const allowedOrigins = [
-    'http://localhost:3000',
-    'https://localhost:3000'
+    'https://technotesfrontend.onrender.com'
 ];
 
 module.exports = allowedOrigins;
