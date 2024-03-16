@@ -1,4 +1,4 @@
-# Golang Restful API with MongoDB Database
+# TechNotes Create Note Website (MERN STACK PROJECT)
 This is hosted on technotes-api-g3mi.onrender.com
 
 ## Quick Start
